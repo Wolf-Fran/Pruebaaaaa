@@ -1,0 +1,59 @@
+body {
+    background-color: #ffe6b3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+.main-container {
+    position: relative; /* Importante para que los elementos hijos se posicionen dentro de él */
+    display: flex; /* Para centrar el mensaje dentro de este contenedor */
+    justify-content: center;
+    align-items: center;
+    height: 100%; /* Ocupa el 100% del body */
+    width: 100%; /* Ocupa el 100% del body */
+}
+
+.flowers-scatter-container {
+    position: absolute; /* Para que las flores floten por encima del fondo pero por debajo del mensaje */
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* Para que las flores no interfieran con clics en el mensaje */
+}
+
+.scattered-flower {
+    position: absolute; /* Cada flor se posiciona de forma absoluta */
+    width: 200px; /* Tamaño de cada flor, ajusta según necesites */
+    height: auto;
+    z-index: 1; /* Las flores estarán debajo del mensaje */
+    animation: float 6s ease-in-out infinite; /* Animación de flotación */
+}
+
+.message {
+    font-size: 3em;
+    color: #4a4a4a;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    animation: fadeIn 3s forwards;
+    z-index: 2; /* El mensaje estará encima de las flores */
+    position: relative; /* Necesario para que z-index funcione correctamente */
+    text-align: center;
+    padding: 20px; /* Espacio alrededor del mensaje para que las flores no lo cubran */
+    background-color: rgba(255, 255, 255, 0.5); /* Un ligero fondo semitransparente para el mensaje */
+    border-radius: 15px; /* Bordes redondeados para el fondo del mensaje */
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes float {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(5deg); } /* Sube y rota ligeramente */
+    100% { transform: translateY(0px) rotate(0deg); }
+}
