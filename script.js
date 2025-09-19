@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const flowersScatterContainer = document.querySelector('.flowers-scatter-container');
     const flowerTemplate = document.querySelector('.flower-template');
     const messageElement = document.querySelector('.message');
-    const numberOfFlowers = 500;
+    const numberOfFlowers = 100;
 
     function getElementDimensions() {
         const messageRect = messageElement.getBoundingClientRect();
