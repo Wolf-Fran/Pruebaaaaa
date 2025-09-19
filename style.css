@@ -30,7 +30,7 @@ body {
 
 .scattered-flower {
     position: absolute;
-    width: 100px; /* Tamaño de la flor en escritorio */
+    width: 200px; /* Tamaño de la flor en escritorio */
     height: auto;
     z-index: 1;
     animation: float 6s ease-in-out infinite;
