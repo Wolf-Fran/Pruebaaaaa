@@ -2,18 +2,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const flowersScatterContainer = document.querySelector('.flowers-scatter-container');
     const flowerTemplate = document.querySelector('.flower-template');
     const messageElement = document.querySelector('.message');
-    const numberOfFlowers = 500;
+    const numberOfFlowers = 300;
 
-    // Obtener las dimensiones del mensaje para no superponer las flores sobre él
-    const messageRect = messageElement.getBoundingClientRect();
+    // Función para obtener las dimensiones actuales del mensaje y de una flor de muestra
+    function getElementDimensions() {
+        const messageRect = messageElement.getBoundingClientRect();
+
+        // Para obtener el tamaño real de la flor, la clonamos temporalmente
+        // la añadimos al DOM, obtenemos su tamaño y luego la removemos.
+        const tempFlower = flowerTemplate.cloneNode(true);
+        tempFlower.style.display = 'block'; // Aseguramos que sea visible para calcular el tamaño
+        tempFlower.style.visibility = 'hidden'; // Pero invisible para el usuario
+        tempFlower.style.position = 'absolute'; // Necesario para que no afecte el layout
+        flowersScatterContainer.appendChild(tempFlower);
+        const flowerWidth = tempFlower.offsetWidth;
+        const flowerHeight = tempFlower.offsetHeight;
+        flowersScatterContainer.removeChild(tempFlower);
+
+        return { messageRect, flowerWidth, flowerHeight };
+    }
+
 
     // Función para generar una posición aleatoria que evite el área del mensaje
-    function getRandomPosition(flowerWidth, flowerHeight) {
+    function getRandomPosition(messageRect, flowerWidth, flowerHeight) {
         let x, y;
         let tries = 0;
-        const maxTries = 100; // Evitar bucles infinitos
+        const maxTries = 200; // Aumentar intentos por si hay menos espacio
 
         do {
+            // Generar posición dentro de las dimensiones actuales de la ventana
             x = Math.random() * (window.innerWidth - flowerWidth);
             y = Math.random() * (window.innerHeight - flowerHeight);
             tries++;
@@ -32,34 +49,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } while (tries < maxTries);
 
-        // Si no se encuentra una posición sin superposición, se devuelve una posición predeterminada
+        // Si no se encuentra una posición sin superposición, se devuelve una posición aleatoria general
+        // O podrías decidir no añadir la flor si el espacio es demasiado pequeño
+        console.warn('No se pudo encontrar una posición sin superposición para una flor. Podría haber superposición.');
         return { x: Math.random() * (window.innerWidth - flowerWidth), y: Math.random() * (window.innerHeight - flowerHeight) };
     }
 
+    // Función para crear y posicionar todas las flores
+    function createAndPositionFlowers() {
+        // Limpiar flores existentes si ya las hay (útil si se llama en resize)
+        flowersScatterContainer.innerHTML = '';
 
-    for (let i = 0; i < numberOfFlowers; i++) {
-        const flower = flowerTemplate.cloneNode(true); // Clonar la imagen base
-        flower.classList.remove('flower-template'); // Quitar la clase de plantilla
-        flower.classList.add('scattered-flower'); // Añadir la clase para el CSS
-        flower.style.display = 'block'; // Hacerla visible
+        const { messageRect, flowerWidth, flowerHeight } = getElementDimensions();
 
-        // Obtener dimensiones de la flor clonada para el cálculo de posición
-        // Asumimos que width del CSS ya está aplicado (100px)
-        const flowerWidth = 100;
-        const flowerHeight = 100; // Asumir altura similar
+        for (let i = 0; i < numberOfFlowers; i++) {
+            const flower = flowerTemplate.cloneNode(true);
+            flower.classList.remove('flower-template');
+            flower.classList.add('scattered-flower');
+            flower.style.display = 'block';
 
-        const { x, y } = getRandomPosition(flowerWidth, flowerHeight);
-        flower.style.left = `${x}px`;
-        flower.style.top = `${y}px`;
+            const { x, y } = getRandomPosition(messageRect, flowerWidth, flowerHeight);
+            flower.style.left = `${x}px`;
+            flower.style.top = `${y}px`;
 
-        // Retraso para que la animación de "float" no sea idéntica en todas
-        flower.style.animationDelay = `${Math.random() * 2}s`;
-        flower.style.animationDuration = `${5 + Math.random() * 3}s`; // Variar duración
+            flower.style.animationDelay = `${Math.random() * 2}s`;
+            flower.style.animationDuration = `${5 + Math.random() * 3}s`;
+            flower.style.transform = `rotate(${Math.random() * 360}deg)`;
 
-        // Opcional: Rotación aleatoria inicial
-        flower.style.transform = `rotate(${Math.random() * 360}deg)`;
-
-
-        flowersScatterContainer.appendChild(flower);
+            flowersScatterContainer.appendChild(flower);
+        }
     }
+
+    // Crear las flores cuando la página carga
+    createAndPositionFlowers();
+
+    // Opcional: Reposicionar las flores cuando se redimensiona la ventana
+    // Esto es importante para que se adapten al cambio de tamaño de pantalla
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(createAndPositionFlowers, 200); // Retraso para no ejecutarlo constantemente
+    });
 });
