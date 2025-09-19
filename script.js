@@ -2,40 +2,51 @@ document.addEventListener('DOMContentLoaded', () => {
     const flowersScatterContainer = document.querySelector('.flowers-scatter-container');
     const flowerTemplate = document.querySelector('.flower-template');
     const messageElement = document.querySelector('.message');
-    const numberOfFlowers = 300;
+    const numberOfFlowers = 10;
 
-    // Función para obtener las dimensiones actuales del mensaje y de una flor de muestra
     function getElementDimensions() {
         const messageRect = messageElement.getBoundingClientRect();
-
-        // Para obtener el tamaño real de la flor, la clonamos temporalmente
-        // la añadimos al DOM, obtenemos su tamaño y luego la removemos.
         const tempFlower = flowerTemplate.cloneNode(true);
-        tempFlower.style.display = 'block'; // Aseguramos que sea visible para calcular el tamaño
-        tempFlower.style.visibility = 'hidden'; // Pero invisible para el usuario
-        tempFlower.style.position = 'absolute'; // Necesario para que no afecte el layout
+        tempFlower.style.display = 'block';
+        tempFlower.style.visibility = 'hidden';
+        tempFlower.style.position = 'absolute';
         flowersScatterContainer.appendChild(tempFlower);
         const flowerWidth = tempFlower.offsetWidth;
         const flowerHeight = tempFlower.offsetHeight;
         flowersScatterContainer.removeChild(tempFlower);
-
         return { messageRect, flowerWidth, flowerHeight };
     }
 
 
-    // Función para generar una posición aleatoria que evite el área del mensaje
+    // --- MODIFICACIÓN AQUÍ EN getRandomPosition ---
     function getRandomPosition(messageRect, flowerWidth, flowerHeight) {
         let x, y;
         let tries = 0;
-        const maxTries = 200; // Aumentar intentos por si hay menos espacio
+        const maxTries = 200;
+
+        // Definir un margen o radio alrededor del centro de la pantalla
+        // para restringir la dispersión de las flores.
+        // Puedes ajustar estos valores según qué tan "centralizadas" las quieras.
+        const centralAreaPadding = 100; // Por ejemplo, 100px desde los bordes del centro
+        
+        // Calcular los límites del área central donde pueden aparecer las flores
+        // Esto crea un rectángulo central donde las flores pueden aparecer
+        const minX = centralAreaPadding;
+        const maxX = window.innerWidth - flowerWidth - centralAreaPadding;
+        const minY = centralAreaPadding;
+        const maxY = window.innerHeight - flowerHeight - centralAreaPadding;
+
+        // Asegurarse de que el área central sea válida (no se solape con sí misma)
+        if (maxX < minX) maxX = minX;
+        if (maxY < minY) maxY = minY;
+
 
         do {
-            // Generar posición dentro de las dimensiones actuales de la ventana
-            x = Math.random() * (window.innerWidth - flowerWidth);
-            y = Math.random() * (window.innerHeight - flowerHeight);
+            // Generar posición dentro del área central definida
+            x = minX + Math.random() * (maxX - minX);
+            y = minY + Math.random() * (maxY - minY);
             tries++;
 
-            // Verificar si la posición de la flor se superpone con el mensaje
             const overlapsWithMessage = (
                 x < messageRect.right &&
                 x + flowerWidth > messageRect.left &&
@@ -49,17 +60,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } while (tries < maxTries);
 
-        // Si no se encuentra una posición sin superposición, se devuelve una posición aleatoria general
-        // O podrías decidir no añadir la flor si el espacio es demasiado pequeño
-        console.warn('No se pudo encontrar una posición sin superposición para una flor. Podría haber superposición.');
-        return { x: Math.random() * (window.innerWidth - flowerWidth), y: Math.random() * (window.innerHeight - flowerHeight) };
+        console.warn('No se pudo encontrar una posición sin superposición para una flor. Podría haber superposición o el espacio central es muy pequeño.');
+        // En caso de que no se encuentre una buena posición central sin superposición,
+        // aún así intentamos una posición más general para asegurar que la flor aparezca.
+        return { x: minX + Math.random() * (maxX - minX), y: minY + Math.random() * (maxY - minY) };
     }
+    // --- FIN DE LA MODIFICACIÓN EN getRandomPosition ---
 
-    // Función para crear y posicionar todas las flores
+
     function createAndPositionFlowers() {
-        // Limpiar flores existentes si ya las hay (útil si se llama en resize)
         flowersScatterContainer.innerHTML = '';
-
         const { messageRect, flowerWidth, flowerHeight } = getElementDimensions();
 
         for (let i = 0; i < numberOfFlowers; i++) {
@@ -80,14 +90,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Crear las flores cuando la página carga
     createAndPositionFlowers();
 
-    // Opcional: Reposicionar las flores cuando se redimensiona la ventana
-    // Esto es importante para que se adapten al cambio de tamaño de pantalla
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(createAndPositionFlowers, 200); // Retraso para no ejecutarlo constantemente
+        resizeTimeout = setTimeout(createAndPositionFlowers, 200);
     });
 });
