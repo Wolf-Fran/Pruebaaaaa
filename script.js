@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Definir un margen o radio alrededor del centro de la pantalla
         // para restringir la dispersión de las flores.
         // Puedes ajustar estos valores según qué tan "centralizadas" las quieras.
-        const centralAreaPadding = 100; // Por ejemplo, 100px desde los bordes del centro
+        const centralAreaPadding = 10; // Por ejemplo, 100px desde los bordes del centro
         
         // Calcular los límites del área central donde pueden aparecer las flores
         // Esto crea un rectángulo central donde las flores pueden aparecer
