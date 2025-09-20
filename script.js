@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const flowerTemplate = document.querySelector('.flower-template');
     const messageElement = document.querySelector('.message');
     // Mantenemos 300 flores, pero si sigue siendo lento, considera reducirlo.
-    const numberOfFlowers = 20; 
+    const numberOfFlowers = 10; 
 
     function getElementDimensions() {
         const messageRect = messageElement.getBoundingClientRect();
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- AJUSTE 2: REDUCIR centralAreaPadding ---
         // Valor más pequeño para permitir que las flores se dispersen más hacia los bordes
         // Por ejemplo, 30px o 0px si quieres que lleguen hasta el borde.
-        const centralAreaPadding = 10; // Puedes ajustar este valor: menos = más dispersión
+        const centralAreaPadding = 30; // Puedes ajustar este valor: menos = más dispersión
         
         const minX = centralAreaPadding;
         const maxX = window.innerWidth - flowerWidth - centralAreaPadding;
