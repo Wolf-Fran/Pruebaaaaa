@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- AJUSTE 2: REDUCIR centralAreaPadding ---
         // Valor más pequeño para permitir que las flores se dispersen más hacia los bordes
         // Por ejemplo, 30px o 0px si quieres que lleguen hasta el borde.
-        const centralAreaPadding = 30; // Puedes ajustar este valor: menos = más dispersión
+        const centralAreaPadding = 20; // Puedes ajustar este valor: menos = más dispersión
         
         const minX = centralAreaPadding;
         const maxX = window.innerWidth - flowerWidth - centralAreaPadding;
