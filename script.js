@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const flowerTemplate = document.querySelector('.flower-template');
     const messageElement = document.querySelector('.message');
     // Mantenemos 300 flores, pero si sigue siendo lento, considera reducirlo.
-    const numberOfFlowers = 300; 
+    const numberOfFlowers = 150; 
 
     function getElementDimensions() {
         const messageRect = messageElement.getBoundingClientRect();
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let x, y;
         let tries = 0;
         // --- AJUSTE 1: AUMENTAR maxTries ---
-        const maxTries = 500; // Aumentado para dar más oportunidades de encontrar espacio
+        const maxTries = 200; // Aumentado para dar más oportunidades de encontrar espacio
         
         // --- AJUSTE 2: REDUCIR centralAreaPadding ---
         // Valor más pequeño para permitir que las flores se dispersen más hacia los bordes
