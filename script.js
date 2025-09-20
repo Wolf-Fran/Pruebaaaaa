@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let x, y;
         let tries = 0;
         // --- AJUSTE 1: AUMENTAR maxTries ---
-        const maxTries = 200; // Aumentado para dar más oportunidades de encontrar espacio
+        const maxTries = 50; // Aumentado para dar más oportunidades de encontrar espacio
         
         // --- AJUSTE 2: REDUCIR centralAreaPadding ---
         // Valor más pequeño para permitir que las flores se dispersen más hacia los bordes
