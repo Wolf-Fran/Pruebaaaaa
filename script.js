@@ -2,7 +2,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const flowersScatterContainer = document.querySelector('.flowers-scatter-container');
     const flowerTemplate = document.querySelector('.flower-template');
     const messageElement = document.querySelector('.message');
-    const numberOfFlowers = 150;
+    // Mantenemos 300 flores, pero si sigue siendo lento, considera reducirlo.
+    const numberOfFlowers = 300; 
 
     function getElementDimensions() {
         const messageRect = messageElement.getBoundingClientRect();
@@ -18,31 +19,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // --- MODIFICACIÓN AQUÍ EN getRandomPosition ---
     function getRandomPosition(messageRect, flowerWidth, flowerHeight) {
         let x, y;
         let tries = 0;
-        const maxTries = 200;
-
-        // Definir un margen o radio alrededor del centro de la pantalla
-        // para restringir la dispersión de las flores.
-        // Puedes ajustar estos valores según qué tan "centralizadas" las quieras.
-        const centralAreaPadding = 100; // Por ejemplo, 100px desde los bordes del centro
+        // --- AJUSTE 1: AUMENTAR maxTries ---
+        const maxTries = 500; // Aumentado para dar más oportunidades de encontrar espacio
         
-        // Calcular los límites del área central donde pueden aparecer las flores
-        // Esto crea un rectángulo central donde las flores pueden aparecer
+        // --- AJUSTE 2: REDUCIR centralAreaPadding ---
+        // Valor más pequeño para permitir que las flores se dispersen más hacia los bordes
+        // Por ejemplo, 30px o 0px si quieres que lleguen hasta el borde.
+        const centralAreaPadding = 30; // Puedes ajustar este valor: menos = más dispersión
+        
         const minX = centralAreaPadding;
         const maxX = window.innerWidth - flowerWidth - centralAreaPadding;
         const minY = centralAreaPadding;
         const maxY = window.innerHeight - flowerHeight - centralAreaPadding;
 
-        // Asegurarse de que el área central sea válida (no se solape con sí misma)
-        if (maxX < minX) maxX = minX;
-        if (maxY < minY) maxY = minY;
+        // Asegurarse de que el área de dispersión tenga un tamaño mínimo,
+        // especialmente en pantallas muy pequeñas.
+        if (maxX < minX + flowerWidth) { // Si el área horizontal es demasiado pequeña
+            maxX = window.innerWidth - flowerWidth; // Extender hasta el borde
+            minX = 0;
+        }
+        if (maxY < minY + flowerHeight) { // Si el área vertical es demasiado pequeña
+            maxY = window.innerHeight - flowerHeight; // Extender hasta el borde
+            minY = 0;
+        }
 
 
         do {
-            // Generar posición dentro del área central definida
             x = minX + Math.random() * (maxX - minX);
             y = minY + Math.random() * (maxY - minY);
             tries++;
@@ -60,12 +65,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } while (tries < maxTries);
 
-        console.warn('No se pudo encontrar una posición sin superposición para una flor. Podría haber superposición o el espacio central es muy pequeño.');
-        // En caso de que no se encuentre una buena posición central sin superposición,
-        // aún así intentamos una posición más general para asegurar que la flor aparezca.
+        console.warn('No se pudo encontrar una posición sin superposición para una flor. Podría haber superposición o el espacio es muy limitado.');
+        // Si después de muchos intentos no encuentra un lugar, simplemente devuelve una posición aleatoria
+        // dentro del área calculada, aceptando una posible superposición.
         return { x: minX + Math.random() * (maxX - minX), y: minY + Math.random() * (maxY - minY) };
     }
-    // --- FIN DE LA MODIFICACIÓN EN getRandomPosition ---
 
 
     function createAndPositionFlowers() {
@@ -82,9 +86,10 @@ document.addEventListener('DOMContentLoaded', () => {
             flower.style.left = `${x}px`;
             flower.style.top = `${y}px`;
 
-            flower.style.animationDelay = `${Math.random() * 2}s`;
-            flower.style.animationDuration = `${5 + Math.random() * 3}s`;
-            flower.style.transform = `rotate(${Math.random() * 360}deg)`;
+            // Variaciones para las animaciones
+            flower.style.animationDelay = `${Math.random() * 5}s`; // Mayor rango de delay
+            flower.style.animationDuration = `${4 + Math.random() * 4}s`; // Mayor rango de duración
+            flower.style.transform = `rotate(${Math.random() * 360}deg)`; // Rotación inicial aleatoria
 
             flowersScatterContainer.appendChild(flower);
         }
