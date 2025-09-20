@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const flowerTemplate = document.querySelector('.flower-template');
     const messageElement = document.querySelector('.message');
     // Mantenemos 300 flores, pero si sigue siendo lento, considera reducirlo.
-    const numberOfFlowers = 50; 
+    const numberOfFlowers = 20; 
 
     function getElementDimensions() {
         const messageRect = messageElement.getBoundingClientRect();
