@@ -2,9 +2,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const flowersScatterContainer = document.querySelector('.flowers-scatter-container');
     const flowerTemplate = document.querySelector('.flower-template');
     const messageElement = document.querySelector('.message');
-    const numberOfFlowers = 300; // Mantén este número o ajusta si hay problemas de rendimiento.
+    const numberOfFlowers = 300; // O el número que estés usando
 
     function getElementDimensions() {
+        // Siempre recalcular las dimensiones del mensaje al inicio de la función
+        // para asegurar que estén actualizadas, especialmente después de un resize.
         const messageRect = messageElement.getBoundingClientRect();
         
         const tempFlower = flowerTemplate.cloneNode(true);
@@ -16,6 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const flowerHeight = tempFlower.offsetHeight;
         flowersScatterContainer.removeChild(tempFlower);
 
+        // Si por alguna razón el mensaje no tiene dimensiones válidas,
+        // podríamos usar un fallback o registrar una advertencia.
+        if (messageRect.width === 0 || messageRect.height === 0) {
+            console.warn("El mensaje no tiene dimensiones válidas al calcular.");
+            // Podrías devolver valores predeterminados o intentar recalcular más tarde
+        }
         return { messageRect, flowerWidth, flowerHeight };
     }
 
@@ -23,39 +31,22 @@ document.addEventListener('DOMContentLoaded', () => {
         let x, y;
         let tries = 0;
         const maxTries = 500;
-        
-        // --- AJUSTES CRÍTICOS AQUÍ ---
-        // Reducimos el padding para que las flores se dispersen más ampliamente.
-        // Si quieres que cubran toda la pantalla, incluso por los bordes, puedes usar 0.
-        const centralAreaPadding = 0; // Cambiado de 30 a 0 o un número muy pequeño
+        const centralAreaPadding = 30; // Ajusta según tu preferencia
 
-        // Calcular los límites del área de dispersión de forma más robusta
-        // Aseguramos que el rango de cálculo siempre sea al menos 0
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
+        const minX = centralAreaPadding;
+        const maxX = window.innerWidth - flowerWidth - centralAreaPadding;
+        const minY = centralAreaPadding;
+        const maxY = window.innerHeight - flowerHeight - centralAreaPadding;
 
-        // Establecer los límites iniciales para toda la ventana (menos el padding)
-        let minX = centralAreaPadding;
-        let maxX = viewportWidth - flowerWidth - centralAreaPadding;
-        let minY = centralAreaPadding;
-        let maxY = viewportHeight - flowerHeight - centralAreaPadding;
-
-        // Asegurarse de que maxX no sea menor que minX (y lo mismo para Y)
-        // Si el área disponible es muy pequeña, permitimos que se sobrepase el padding
-        if (maxX <= minX) { // Si el área horizontal es demasiado pequeña para el padding
-            minX = 0;
-            maxX = Math.max(0, viewportWidth - flowerWidth); // Asegura que no sea negativo
-        }
-        if (maxY <= minY) { // Si el área vertical es demasiado pequeña para el padding
-            minY = 0;
-            maxY = Math.max(0, viewportHeight - flowerHeight); // Asegura que no sea negativo
-        }
-        // --- FIN DE AJUSTES CRÍTICOS ---
-
+        // Asegurarse de que el área de dispersión tenga un tamaño mínimo
+        const safeMinX = (maxX < minX + flowerWidth) ? 0 : minX;
+        const safeMaxX = (maxX < minX + flowerWidth) ? window.innerWidth - flowerWidth : maxX;
+        const safeMinY = (maxY < minY + flowerHeight) ? 0 : minY;
+        const safeMaxY = (maxY < minY + flowerHeight) ? window.innerHeight - flowerHeight : maxY;
 
         do {
-            x = minX + Math.random() * (maxX - minX);
-            y = minY + Math.random() * (maxY - minY);
+            x = safeMinX + Math.random() * (safeMaxX - safeMinX);
+            y = safeMinY + Math.random() * (safeMaxY - safeMinY);
             tries++;
 
             const overlapsWithMessage = (
@@ -72,22 +63,22 @@ document.addEventListener('DOMContentLoaded', () => {
         } while (tries < maxTries);
 
         console.warn('No se pudo encontrar una posición sin superposición para una flor. Podría haber superposición o el espacio es muy limitado.');
-        // Si fallan todos los intentos, devolvemos una posición aleatoria dentro del rango calculado
-        return { x: minX + Math.random() * (maxX - minX), y: minY + Math.random() * (maxY - minY) };
+        return { x: safeMinX + Math.random() * (safeMaxX - safeMinX), y: safeMinY + Math.random() * (safeMaxY - safeMinY) };
     }
 
-
     function createAndPositionFlowers() {
+        // Verificar que el contenedor de las flores y el mensaje existan
         if (!flowersScatterContainer || !messageElement || !flowerTemplate) {
             console.error("Elementos DOM necesarios no encontrados. No se pueden crear las flores.");
-            return;
+            return; // Salir si falta algo crítico
         }
-        flowersScatterContainer.innerHTML = '';
+
+        flowersScatterContainer.innerHTML = ''; // Limpia las flores existentes
 
         const { messageRect, flowerWidth, flowerHeight } = getElementDimensions();
-        
-        // Puedes agregar una pequeña comprobación aquí para 'messageRect' si es necesario
-        // if (messageRect.width === 0 || messageRect.height === 0) { ... }
+
+        // Si el mensaje tiene dimensiones inválidas, podría ser un problema.
+        // Podríamos intentar de nuevo o salir. Por ahora, asumimos que es válido.
 
         for (let i = 0; i < numberOfFlowers; i++) {
             const flower = flowerTemplate.cloneNode(true);
@@ -107,11 +98,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    createAndPositionFlowers();
+    createAndPositionFlowers(); // Crea las flores al cargar la página
 
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(createAndPositionFlowers, 300);
+        // Aumenta el tiempo si el problema persiste. Esto da más tiempo al navegador para estabilizarse.
+        resizeTimeout = setTimeout(createAndPositionFlowers, 300); // Antes 200ms
     });
 });
