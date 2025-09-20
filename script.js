@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function getRandomPosition(messageRect, flowerWidth, flowerHeight) {
         let x, y;
         let tries = 0;
-        const maxTries = 1000; // Aumentamos intentos ya que hay menos espacio válido
+        const maxTries = 100; // Aumentamos intentos ya que hay menos espacio válido
 
         // Ajustamos el padding a 0 para que puedan cubrir toda la pantalla
         const centralAreaPadding = 0;
