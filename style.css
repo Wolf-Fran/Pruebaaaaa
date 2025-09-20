@@ -67,7 +67,7 @@ body {
 /* --- Media Query para Teléfonos (pantallas con un ancho máximo de 600px) --- */
 @media (max-width: 600px) {
     .scattered-flower {
-        width: 100px; /* Tamaño de la flor reducido para teléfonos */
+        width: 130px; /* Tamaño de la flor reducido para teléfonos */
     }
 
     .message {
